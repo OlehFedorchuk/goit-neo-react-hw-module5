@@ -1,28 +1,55 @@
-import { useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { getMovieCredits, IMG_200 } from "../../apiService/tmbd";
 
 const MovieCast = () => {
-  const { movie } = useOutletContext();
-  const IMG_BASE = "https://image.tmdb.org/t/p/w200";
+  const { movieId } = useParams();
+
+  const [cast, setCast] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCast = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getMovieCredits(movieId);
+        setCast(data);
+      } catch {
+        setError("Failed to load cast");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCast();
+  }, [movieId]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+  if (cast.length === 0) return <p>No cast information</p>;
+
   return (
-    <>
-      <h3>Production Companies</h3>
-
-      <ul>
-        {movie?.production_companies?.map((company) => (
-          <li key={company.id}>
-            <p>{company.name}</p>
-
-            {company.logo_path && (
-              <img
-                src={`${IMG_BASE}${company.logo_path}`}
-                alt={company.name}
-                style={{ maxWidth: "120px" }}
-              />
-            )}
-          </li>
-        ))}
-      </ul>
-    </>
+    <ul>
+      {cast.map((actor) => (
+        <li key={actor.credit_id}>
+          <img
+            width="120"
+            src={
+              actor.profile_path
+                ? `${IMG_200}${actor.profile_path}`
+                : "https://via.placeholder.com/120x180?text=No+Photo"
+            }
+            alt={actor.name}
+          />
+          <p>
+            <b>{actor.name}</b>
+          </p>
+          <p>Character: {actor.character}</p>
+        </li>
+      ))}
+    </ul>
   );
 };
 

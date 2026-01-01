@@ -1,36 +1,62 @@
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { searchMovies } from "../../apiService/tmbd";
 import MovieList from "../../components/MovieList/MovieList";
-import { useLocation, useSearchParams } from "react-router-dom";
-const MoviesPage = ({ onSubmit, listMovies }) => {
-  const location = useLocation();
+
+const MoviesPage = () => {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryFromUrl = searchParams.get("query") ?? "";
-  console.log("queryFromUrl", queryFromUrl);
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const value = event.target.elements.search.value.trim();
-    console.log("Value", value);
-    if (!value) {
-      console.log("Error: films not found. Try again.");
-      return;
-    }
+  const query = searchParams.get("query") ?? "";
+
+  useEffect(() => {
+    if (!query) return;
+
+    const fetchByQuery = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await searchMovies(query);
+        setMovies(data);
+      } catch {
+        setError("Failed to load movies");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchByQuery();
+  }, [query]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const value = e.target.elements.search.value.trim();
+    if (!value) return;
+
     setSearchParams({ query: value });
-    onSubmit(value);
   };
+
   return (
-    <>
-      <p>page/MoviesPage</p>
+    <main>
       <form onSubmit={handleSubmit}>
         <input
-          type="text"
           name="search"
           autoComplete="off"
-          autoFocus
           placeholder="Search films"
+          defaultValue={query}
         />
         <button type="submit">Search</button>
       </form>
-      <MovieList list={listMovies} state={location} />
-    </>
+
+      {loading && <p>Loading...</p>}
+      {error && <p>{error}</p>}
+
+      {movies.length > 0 && <MovieList movies={movies} />}
+      {!loading && query && movies.length === 0 && <p>No movies found</p>}
+    </main>
   );
 };
+
 export default MoviesPage;

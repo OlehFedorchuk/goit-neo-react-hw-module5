@@ -1,4 +1,4 @@
-.active {
+/* .active {
     color: rgb(214, 121, 21);
 }
 
@@ -13,4 +13,22 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
     padding: 10px;
     border-radius: 5px;
+} */
+.header {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.nav {
+    display: flex;
+    gap: 12px;
+}
+
+.link {
+    text-decoration: none;
+}
+
+.active {
+    text-decoration: underline;
+    font-weight: 600;
 }

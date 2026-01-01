@@ -1,56 +1,81 @@
-import { useParams, Outlet, Link, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { getMovieById } from "../../apiService/movie";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useLocation,
+  useParams,
+} from "react-router-dom";
+import { getMovieDetails, IMG_500 } from "../../apiService/tmbd";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
+  const location = useLocation();
+  const backLinkRef = useRef(location.state?.from ?? "/movies");
 
   const [movie, setMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const location = useLocation();
-  const backLinkRef = useRef(location.state?.from ?? "/");
-
   useEffect(() => {
-    const fetchMovie = async () => {
+    const fetchDetails = async () => {
       try {
         setLoading(true);
-        const data = await getMovieById(movieId);
+        setError(null);
+        const data = await getMovieDetails(movieId);
         setMovie(data);
-      } catch (err) {
-        console.log("err", err.response?.status, err.response?.data);
-        setError("Failed to load movie");
+      } catch {
+        setError("Failed to load movie details");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMovie();
+    fetchDetails();
   }, [movieId]);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
   if (!movie) return null;
-  const IMG_BASE = "https://image.tmdb.org/t/p/w500";
 
   return (
-    <>
+    <main>
       <Link to={backLinkRef.current}>Go back</Link>
-      <img
-        src={
-          movie.backdrop_path
-            ? `${IMG_BASE}${movie.backdrop_path}`
-            : "https://via.placeholder.com/500x281?text=No+Image"
-        }
-        alt={movie.title}
-      />
-      <h2>{movie.title}</h2>
-      <p>{movie.overview}</p>
-      <Link to="cast">Cast</Link>
-      <Link to="reviews">Reviews</Link>
-      <Outlet context={{ movie }} />
-    </>
+
+      <div>
+        <img
+          width="300"
+          src={
+            movie.poster_path
+              ? `${IMG_500}${movie.poster_path}`
+              : "https://via.placeholder.com/300x450?text=No+Poster"
+          }
+          alt={movie.title}
+        />
+
+        <h2>{movie.title}</h2>
+        <p>User score: {Math.round(movie.vote_average * 10)}%</p>
+        <h3>Overview</h3>
+        <p>{movie.overview}</p>
+
+        <h3>Genres</h3>
+        <p>{movie.genres?.map((g) => g.name).join(", ")}</p>
+      </div>
+
+      <hr />
+
+      <h3>Additional information</h3>
+      <ul>
+        <li>
+          <NavLink to="cast">Cast</NavLink>
+        </li>
+        <li>
+          <NavLink to="reviews">Reviews</NavLink>
+        </li>
+      </ul>
+
+      <Outlet />
+    </main>
   );
 };
 
