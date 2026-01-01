@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getMovieCredits, IMG_200 } from "../../apiService/tmbd";
-
+import { getMovieCredits, IMG_200 } from "../../apiService/tmdb";
+import noPhoto from "../../assets/no-photo.png";
 const MovieCast = () => {
   const { movieId } = useParams();
 
@@ -37,9 +37,7 @@ const MovieCast = () => {
           <img
             width="120"
             src={
-              actor.profile_path
-                ? `${IMG_200}${actor.profile_path}`
-                : "https://via.placeholder.com/120x180?text=No+Photo"
+              actor.profile_path ? `${IMG_200}${actor.profile_path}` : noPhoto
             }
             alt={actor.name}
           />

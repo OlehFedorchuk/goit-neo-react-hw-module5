@@ -6,7 +6,8 @@ import {
   useLocation,
   useParams,
 } from "react-router-dom";
-import { getMovieDetails, IMG_500 } from "../../apiService/tmbd";
+import { getMovieDetails, IMG_500 } from "../../apiService/tmdb";
+import css from "../MovieDetailsPage/MovieDetailsPage.module.css";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
@@ -40,7 +41,9 @@ const MovieDetailsPage = () => {
 
   return (
     <main>
-      <Link to={backLinkRef.current}>Go back</Link>
+      <Link to={backLinkRef.current} className={css.backBtn}>
+        Go back
+      </Link>
 
       <div>
         <img

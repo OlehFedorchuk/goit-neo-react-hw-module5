@@ -1,0 +1,27 @@
+.backBtn::before {
+    content: "←";
+    margin-right: 6px;
+}
+
+.backBtn {
+    display: inline-block;
+    padding: 8px 14px;
+    margin-bottom: 16px;
+
+    background-color: #1976d2;
+    color: #fff;
+    text-decoration: none;
+
+    border-radius: 6px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    margin-top: 10px;
+}
+
+.backBtn:hover {
+    background-color: #1565c0;
+}
+
+.backBtn:active {
+    transform: translateY(1px);
+}
